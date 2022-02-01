@@ -71,9 +71,9 @@ def opponents_move(env, state):
     # TODO: Optional? change this to select actions with your policy too
     # that way you get way more interesting games, and you can see if starting
     # is enough to guarrantee a win
-    action = int(input("Select move between 0 - 6: ")) # Play against AI (student)
+    #action = int(input("Select move between 0 - 6: ")) # Play against AI (student)
     #action = student_move(state, 3, -math.inf, math.inf, False)[1] # AI Against AI
-    #action = random.choice(list(avmoves)) # Random choice
+    action = random.choice(list(avmoves)) # Random choice
 
     state, reward, done, _ = env.step(action)
     if done:
@@ -139,9 +139,9 @@ def eval_window(window, piece) -> int:
     if window.count(piece) == 3 and window.count(0) == 1:
         return 10
     elif window.count(piece) == 2 and window.count(0) == 2:
-        return 2
+        return 3
     elif window.count(opp_piece) == 3 and window.count(0) == 1:
-        return -4 * piece
+        return -8
 
     return 0
 
@@ -283,7 +283,7 @@ def play_game(vs_server=False):
     while not done:
         # Select your move
         t1 = time.time()
-        stmove = student_move(state, 6, -math.inf, math.inf, True)[1]
+        stmove = student_move(state, 5, -math.inf, math.inf, True)[1]
         t2 = time.time()
         print("Student move took " + str(round(t2 - t1, 3)) + " seconds")
 
