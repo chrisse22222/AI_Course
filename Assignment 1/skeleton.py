@@ -7,6 +7,7 @@ import requests
 import numpy as np
 import argparse
 import sys
+import time
 from gym_connect_four import ConnectFourEnv
 
 env: ConnectFourEnv = gym.make("ConnectFour-v0")
@@ -70,8 +71,9 @@ def opponents_move(env, state):
     # TODO: Optional? change this to select actions with your policy too
     # that way you get way more interesting games, and you can see if starting
     # is enough to guarrantee a win
-    action = int(input("Select move between 0 - 6: "))
-    #action = student_move(state, 3, -math.inf, math.inf, False)[1]#random.choice(list(avmoves))
+    action = int(input("Select move between 0 - 6: ")) # Play against AI (student)
+    #action = student_move(state, 3, -math.inf, math.inf, False)[1] # AI Against AI
+    # #random.choice(list(avmoves)) # Random choice
 
     state, reward, done, _ = env.step(action)
     if done:
@@ -125,13 +127,14 @@ def place_piece(board, col, piece):
             return
 
 
-def evaluate(board):
+# Evaluates players (students) and "AI" position and compares them.
+def evaluate(board) -> int:
     player_score = score_count(board, PLAYER_PIECE)
     ai_score = score_count(board, AI_PIECE)
     return player_score - ai_score
 
 
-def eval_window(window, piece):
+def eval_window(window, piece) -> int:
     opp_piece = piece * -1
     if window.count(piece) == 3 and window.count(0) == 1:
         return 10
@@ -143,10 +146,11 @@ def eval_window(window, piece):
     return 0
 
 
-def score_count(board, piece):
+def score_count(board, piece) -> int:
     score = 0
 
-    center_array = [int(i) for i in list(board[:, len(board[0])//2])] # It will favor the middle of the board, (better ods)
+    # It will favor the middle of the board, (better ods)
+    center_array = [int(i) for i in list(board[:, len(board[0])//2])]
     center_count = center_array.count(piece)
     score += center_count * 10
 
@@ -175,20 +179,26 @@ def score_count(board, piece):
     return score
 
 
-def is_terminal(board):
-    return winning_move(board, PLAYER_PIECE) or winning_move(board, AI_PIECE) or len(available_moves(board)) == 0
+def is_terminal(board) -> int:
+    if winning_move(board, PLAYER_PIECE):
+        return 1
+    elif winning_move(board, AI_PIECE):
+        return 2
+    elif len(available_moves(board)) == 0:
+        return 3
+    return 0
 
 
-def student_move(board, depth, alpha, beta, maximizing_player):
+def student_move(board, depth, alpha, beta, maximizing_player) -> (int, int):
     terminal = is_terminal(board)
     moves = available_moves(board)
-    if depth == 0 or terminal:
-        if terminal:
-            if winning_move(board, PLAYER_PIECE):
+    if depth == 0 or terminal != 0:
+        if terminal != 0:
+            if terminal == 1:  # Winning move player
                 return math.inf, None
-            elif winning_move(board, AI_PIECE):
+            elif terminal == 2:  # Winning move AI
                 return -math.inf, None
-            else:
+            else:  # Draw
                 return 0, None
         else:
             return evaluate(board), None
@@ -240,8 +250,8 @@ def play_game(vs_server=False):
    error = -10 (you get this if you try to play in a full column)
    Currently the player always makes the first move
    """
-    # default state
-    state = np.zeros((6, 7), dtype=int)  # boarden?
+    # default state of the board
+    state = np.zeros((6, 7), dtype=int)
 
     # setup new game
     if vs_server:
@@ -272,7 +282,10 @@ def play_game(vs_server=False):
     done = False
     while not done:
         # Select your move
-        stmove = student_move(state, 6, -math.inf, math.inf, True)[1]  # TODO: change input here
+        t1 = time.time()
+        stmove = student_move(state, 6, -math.inf, math.inf, True)[1]
+        t2 = time.time()
+        print("Student move took " + str(round(t2 - t1, 3)) + " seconds")
 
         # make both student and bot/server moves
         if vs_server:
