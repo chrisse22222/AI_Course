@@ -73,7 +73,7 @@ def opponents_move(env, state):
     # is enough to guarrantee a win
     action = int(input("Select move between 0 - 6: ")) # Play against AI (student)
     #action = student_move(state, 3, -math.inf, math.inf, False)[1] # AI Against AI
-    # #random.choice(list(avmoves)) # Random choice
+    #action = random.choice(list(avmoves)) # Random choice
 
     state, reward, done, _ = env.step(action)
     if done:
