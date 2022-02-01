@@ -103,13 +103,13 @@ def winning_move(board, piece):
             if board[r][c] == piece and board[r+1][c] == piece and board[r+2][c] == piece and board[r+3][c] == piece:
                 return True
 
-    # Check positively sloped diagnoals
+    # Check positively sloped diagonals
     for c in range(len(board[0]) - 3):
         for r in range(len(board) - 3):
             if board[r][c] == piece and board[r-1][c+1] == piece and board[r-2][c+2] == piece and board[r-3][c+3] == piece:
                 return True
 
-    # Check negatively sloped diagnoals
+    # Check negatively sloped diagonals
     for c in range(len(board[0]) - 3):
         for r in range(3, len(board)):
             if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece and board[r - 3][c + 3] == piece:
@@ -162,12 +162,12 @@ def score_count(board, piece):
             window = col_array[r:r + WINDOW_COUNT]
             score += eval_window(window, piece)
 
-    for r in range(len(board) - 3):  # Positively sloped diagnoals
+    for r in range(len(board) - 3):  # Positively sloped diagonals
         for c in range(len(board[0]) - 3):
             window = [board[r + i][c + i] for i in range(WINDOW_COUNT)]
             score += eval_window(window, piece)
 
-    for r in range(len(board) - 3):  # Negatively sloped diagnoals
+    for r in range(len(board) - 3):  # Negatively sloped diagonals
         for c in range(len(board[0]) - 3):
             window = [board[r + 3 - i][c + i] for i in range(WINDOW_COUNT)]
             score += eval_window(window, piece)
