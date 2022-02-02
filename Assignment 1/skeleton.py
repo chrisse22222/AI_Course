@@ -71,9 +71,9 @@ def opponents_move(env, state):
     # TODO: Optional? change this to select actions with your policy too
     # that way you get way more interesting games, and you can see if starting
     # is enough to guarrantee a win
-    #action = int(input("Select move between 0 - 6: ")) # Play against AI (student)
+    action = int(input("Select move between 0 - 6: ")) # Play against AI (student)
     #action = student_move(state, 3, -math.inf, math.inf, False)[1] # AI Against AI
-    action = random.choice(list(avmoves)) # Random choice
+    #action = random.choice(list(avmoves)) # Random choice
 
     state, reward, done, _ = env.step(action)
     if done:
@@ -92,7 +92,7 @@ def available_moves(board):
     return moves
 
 
-def winning_move(board, piece):
+def is_winning_move(board, piece):
     # Check horizontal locations for win
     for c in range(len(board[0]) - 3):
         for r in range(len(board)):
@@ -135,13 +135,10 @@ def evaluate(board) -> int:
 
 
 def eval_window(window, piece) -> int:
-    opp_piece = piece * -1
     if window.count(piece) == 3 and window.count(0) == 1:
         return 10
     elif window.count(piece) == 2 and window.count(0) == 2:
         return 3
-    elif window.count(opp_piece) == 3 and window.count(0) == 1:
-        return -8
 
     return 0
 
@@ -149,7 +146,7 @@ def eval_window(window, piece) -> int:
 def score_count(board, piece) -> int:
     score = 0
 
-    # It will favor the middle of the board, (better ods)
+    # It will favor the middle of the board, better odds to win.
     center_array = [int(i) for i in list(board[:, len(board[0])//2])]
     center_count = center_array.count(piece)
     score += center_count * 10
@@ -180,9 +177,9 @@ def score_count(board, piece) -> int:
 
 
 def is_terminal(board) -> int:
-    if winning_move(board, PLAYER_PIECE):
+    if is_winning_move(board, PLAYER_PIECE):
         return 1
-    elif winning_move(board, AI_PIECE):
+    elif is_winning_move(board, AI_PIECE):
         return 2
     elif len(available_moves(board)) == 0:
         return 3
@@ -191,35 +188,36 @@ def is_terminal(board) -> int:
 
 def student_move(board, depth, alpha, beta, maximizing_player) -> (int, int):
     terminal = is_terminal(board)
-    moves = available_moves(board)
     if depth == 0 or terminal != 0:
-        if terminal != 0:
-            if terminal == 1:  # Winning move player
+        match terminal:
+            case 1:  # Winning move player (Student)
                 return math.inf, None
-            elif terminal == 2:  # Winning move AI
+            case 2:  # Winning move AI (Server/local)
                 return -math.inf, None
-            else:  # Draw
+            case 3:  # Draw
                 return 0, None
-        else:
-            return evaluate(board), None
 
-    col = random.choice(moves)
+        # depth == 0, evaluate the position on the board
+        return evaluate(board), None
+
+    moves = available_moves(board)  # get legal moves on the board
+    good_move = random.choice(moves)  # init good_move, in this case a random valid move
     if maximizing_player:
         value = -math.inf
         for move in moves:
-            b_copy = board.copy()
+            b_copy = board.copy()  # copy boards current state
             place_piece(b_copy, move, PLAYER_PIECE)
             new_value = student_move(b_copy, depth - 1, alpha, beta, False)[0]
 
-            if new_value > value:
+            if new_value > value:  # max:(value, new_value)
                 value = new_value
-                col = move
+                good_move = move
 
             alpha = max(alpha, value)
             if alpha >= beta:
                 break
 
-        return value, col
+        return value, good_move
 
     else:
         value = math.inf
@@ -228,15 +226,15 @@ def student_move(board, depth, alpha, beta, maximizing_player) -> (int, int):
             place_piece(b_copy, move, AI_PIECE)
             new_value = student_move(b_copy, depth - 1, alpha, beta, True)[0]
 
-            if new_value < value:
+            if new_value < value:  # min:(value, new_value)
                 value = new_value
-                col = move
+                good_move = move
 
             beta = min(beta, value)
             if alpha >= beta:
                 break
 
-        return value, col
+        return value, good_move
 
 
 def play_game(vs_server=False):
@@ -283,7 +281,7 @@ def play_game(vs_server=False):
     while not done:
         # Select your move
         t1 = time.time()
-        stmove = student_move(state, 5, -math.inf, math.inf, True)[1]
+        stmove = student_move(state, 6, -math.inf, math.inf, True)[1]
         t2 = time.time()
         print("Student move took " + str(round(t2 - t1, 3)) + " seconds")
 
