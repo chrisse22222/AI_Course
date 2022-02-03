@@ -201,7 +201,7 @@ def student_move(board, depth, alpha, beta, maximizing_player) -> (int, int):
         return evaluate(board), None
 
     moves = available_moves(board)  # get legal moves on the board
-    good_move = random.choice(moves)  # init good_move, in this case a random valid move
+    candidate = random.choice(moves)  # init candidate, in this case a random valid move
     if maximizing_player:
         value = -math.inf
         for move in moves:
@@ -211,13 +211,13 @@ def student_move(board, depth, alpha, beta, maximizing_player) -> (int, int):
 
             if new_value > value:  # max:(value, new_value)
                 value = new_value
-                good_move = move
+                candidate = move
 
             alpha = max(alpha, value)
-            if alpha >= beta:
+            if value >= beta:
                 break
 
-        return value, good_move
+        return value, candidate
 
     else:
         value = math.inf
@@ -228,13 +228,13 @@ def student_move(board, depth, alpha, beta, maximizing_player) -> (int, int):
 
             if new_value < value:  # min:(value, new_value)
                 value = new_value
-                good_move = move
+                candidate = move
 
             beta = min(beta, value)
-            if alpha >= beta:
+            if value <= alpha:
                 break
 
-        return value, good_move
+        return value, candidate
 
 
 def play_game(vs_server=False):
