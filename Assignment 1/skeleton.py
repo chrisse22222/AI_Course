@@ -83,7 +83,7 @@ def opponents_move(env, state):
     return state, reward, done
 
 
-def available_moves(board):
+def available_moves(board) -> list:
     moves = []
     for c in range(len(board[0])):
         if board[0][c] == 0:
@@ -92,7 +92,7 @@ def available_moves(board):
     return moves
 
 
-def is_winning_move(board, piece):
+def is_winning_move(board, piece) -> bool:
     # Check horizontal locations for win
     for c in range(len(board[0]) - 3):
         for r in range(len(board)):
