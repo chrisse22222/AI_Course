@@ -48,9 +48,7 @@ def create_map_with_heading(plt, room, numbers):
 
     pos_hlines = np.arange(0, room.shape[0]+1, 3)
     pos_vlines = np.arange(0, room.shape[1]+1, 3)
-    
-    print( room.shape[0], len(room[0]), pos_hlines)
-    
+
     ax.hlines(pos_hlines, *ax.get_xlim())
     ax.vlines(pos_vlines, *ax.get_ylim())
 
