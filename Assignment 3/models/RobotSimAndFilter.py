@@ -12,45 +12,10 @@ class RobotSim:
         self.dir_ls_2 = [(0, -2), (-1, -2), (-2, -2), (-2, -1), (-2, 0), (-2, 1), (-2, 2),
                          (-1, 2), (0, 2), (1, 2), (2, 2), (2, 1), (2, 0), (2, -1), (2, -2), (1, -2)]
 
-    # Return the headings that the robot can move in
-    def get_headings(self, tsX, tsY):
-        headings = []
-        if tsX > 0:
-            headings.append(0)  # North
-        if tsY < self.rows - 1:
-            headings.append(1)  # East
-        if tsX < self.cols - 1:
-            headings.append(2)  # South
-        if tsY > 0:
-            headings.append(3)  # West
-
-        return headings
-
     # Generates a random next state according to rules
     def new_state(self, true_state):
-        tsX, tsY, tsH = self.s_m.state_to_pose(true_state)
-        headings = self.get_headings(tsX, tsY)
-
-        prob = random.random()
-        # Picks a heading according to the robot strategy
-        if tsH in headings:
-            if prob <= 0.3:
-                headings.remove(tsH)
-                tsH = random.choice(headings)
-        else:
-            tsH = random.choice(headings)
-
-        # Moves one step in the direction of heading
-        if tsH == 0:  # North
-            tsX -= 1
-        elif tsH == 1:  # East
-            tsY += 1
-        elif tsH == 2:  # South
-            tsX += 1
-        elif tsH == 3:  # West
-            tsY -= 1
-
-        return self.s_m.pose_to_state(tsX, tsY, tsH)
+        probs = self.t_m.get_T()[true_state]
+        return random.choices(range(len(probs)), probs)[0]
 
     def sensor_reading(self, tsX, tsY):
         # use direction array to calculate ls and ls2
@@ -92,5 +57,5 @@ class HMMFilter:
         o_reading = self.o_m.get_o_reading(reading)
         probs = o_reading @ f @ last_probs
         # Normalized vector
-        alpha = 1 / np.linalg.norm(probs)
+        alpha = 1 / sum(probs)
         return alpha * probs

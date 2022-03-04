@@ -108,7 +108,7 @@ class Localizer:
             
         eX, eY = self.__estimate
 
-        # Generates a error based on manhattan distance
+        # Generates an error based on manhattan distance
         error = manhattan(tsX, eX, tsY, eY)
         # if you use the visualisation (dashboard), this return statement needs to be kept the same
         # or the visualisation needs to be adapted (your own risk!)

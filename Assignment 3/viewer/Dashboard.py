@@ -175,7 +175,7 @@ class Dashboard:
             self.nbr_of_moves = 0
             self.initialised = False
 
-            self.plot_time = 0.01 * self.rows * self.cols * self.head
+            self.plot_time = 0.005 * self.rows * self.cols * self.head
 
             self.visualizationroom = np.empty(shape=(self.rows * 3, self.cols * 3))
 
